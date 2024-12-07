@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comments System</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.5"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@3.0.0/dist/full.css" rel="stylesheet" />
+</head>
+<body class="p-5 bg-base-100">
+  <div class="container mx-auto">
+    <h1 class="text-2xl font-bold mb-8">Comments</h1>
+    <table class="table w-full">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Created At</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Description</th>
+          <th>Slug</th>
+          <th>Hidden</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="commentsTable">
+        <!-- Data rows will be appended here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Inisialisasi Supabase dengan createClient
+    const db = supabase.createClient("https://fazgqprfskihzewydntw.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhemdxcHJmc2tpaHpld3lkbnR3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMjg4MjQ2NCwiZXhwIjoyMDQ4NDU4NDY0fQ.o6wa0HF-9PBVFXP_h0KKzRrjMa2BnrieSi5DYINAGFk");
+
+    // Fungsi untuk fetch data komentar
+    async function fetchComments() {
+      try {
+        const { data, error } = await db
+          .from("comments")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        const tableBody = document.getElementById("commentsTable");
+        tableBody.innerHTML = "";
+
+        data.forEach(comment => {
+        const row = document.createElement("tr");
+        const description = comment.description.length > 160 ? comment.description.slice(0, 160) + '...' : comment.description;
+
+        row.innerHTML = `
+          <td>${comment.id}</td>
+          <td>${new Date(comment.created_at).toLocaleString()}</td>
+          <td>${comment.name}</td>
+          <td>${comment.email}</td>
+          <td>${description}</td>
+          <td><a target="_blank" class="hover:underline text-primary" href="https://sdn19periji.sch.id${comment.slug}">${comment.slug}</a></td>
+          <td>${comment.hidden ? "Yes" : "No"}</td>
+          <td>
+            <button class="btn btn-error btn-sm" onclick="deleteComment(${comment.id})">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    }
+
+    // Fungsi untuk delete komentar
+    async function deleteComment(commentId) {
+      try {
+        const { error } = await db
+          .from("comments")
+          .delete()
+          .eq("id", commentId);
+
+        if (error) throw error;
+
+        alert("Comment deleted successfully!");
+        fetchComments();
+      } catch (error) {
+        console.error("Error deleting comment:", error);
+        alert("Failed to delete comment.");
+      }
+    }
+
+    // Fetch data saat halaman dimuat
+    document.addEventListener("DOMContentLoaded", function () {
+      fetchComments();
+    });
+
+    // Membuat fungsi deleteComment global
+    window.deleteComment = deleteComment;
+  </script>
+</body>
+</html>
