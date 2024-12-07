@@ -59,7 +59,14 @@
           <td><a href="mailto:${comment.email}" target="_blank" class="hover:underline text-primary">${email}</a></td>
           <td>${description}</td>
           <td><a target="_blank" class="hover:underline text-primary" href="https://sdn19periji.sch.id${comment.slug}">${comment.slug}</a></td>
-          <td>${comment.hidden ? "Yes" : "No"}</td>
+          <td>
+            <select 
+              class="select select-bordered select-sm"
+              onchange="updateHidden(${comment.id}, this.value)">
+              <option value="false" ${!comment.hidden ? "selected" : ""}>FALSE</option>
+              <option value="true" ${comment.hidden ? "selected" : ""}>TRUE</option>
+            </select>
+          </td>
           <td>
             <button class="btn btn-error btn-sm" onclick="deleteComment(${comment.id})">Delete</button>
           </td>
@@ -69,6 +76,25 @@
 
       } catch (error) {
         console.error("Error fetching comments:", error);
+      }
+    }
+
+    // Update hidden status
+    async function updateHidden(commentId, value) {
+      try {
+        const hidden = value === "true"; // Mengonversi nilai string menjadi boolean
+        const { data, error } = await db
+          .from("comments")
+          .update({ hidden }) // Mengupdate kolom "hidden" dengan nilai baru
+          .eq("id", commentId); // Mencocokkan ID komentar
+      
+        if (error) throw error;
+      
+        alert("Hidden status updated successfully!");
+        fetchComments(); // Memuat ulang tabel untuk mencerminkan perubahan
+      } catch (error) {
+        console.error("Error updating hidden status:", error);
+        alert("Failed to update hidden status.");
       }
     }
 
