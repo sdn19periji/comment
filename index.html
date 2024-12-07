@@ -50,12 +50,13 @@
         data.forEach(comment => {
         const row = document.createElement("tr");
         const description = comment.description.length > 160 ? comment.description.slice(0, 160) + '...' : comment.description;
+        const email = comment.email.length > 8 ? comment.email.slice(0, 8) + '...' : comment.name;
 
         row.innerHTML = `
           <td>${comment.id}</td>
           <td>${new Date(comment.created_at).toLocaleString()}</td>
           <td>${comment.name}</td>
-          <td>${comment.email}</td>
+          <td><a href="mailto:${comment.email}" target="_blank" class="hover:underline text-primary">${email}</a></td>
           <td>${description}</td>
           <td><a target="_blank" class="hover:underline text-primary" href="https://sdn19periji.sch.id${comment.slug}">${comment.slug}</a></td>
           <td>${comment.hidden ? "Yes" : "No"}</td>
