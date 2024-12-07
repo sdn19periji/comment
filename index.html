@@ -50,7 +50,7 @@
         data.forEach(comment => {
         const row = document.createElement("tr");
         const description = comment.description.length > 160 ? comment.description.slice(0, 160) + '...' : comment.description;
-        const email = comment.email.length > 8 ? comment.email.slice(0, 8) + '...' : comment.name;
+        const email = comment.email.length > 8 ? comment.email.slice(0, 8) + '...' : comment.email;
 
         row.innerHTML = `
           <td>${comment.id}</td>
